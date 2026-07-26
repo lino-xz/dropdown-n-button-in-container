@@ -138,14 +138,14 @@ class CoreBot(commands.Bot):
 
 bot = CoreBot()
 
-# 1. Prefix Commands
+# 1. Prefix commands
 @bot.command(name="help", aliases=["demo", "preview"])
 async def help_command(ctx: commands.Context) -> None:
     view = SimpleLayoutView(author_id=ctx.author.id, user_name=ctx.author.name)
     await ctx.send(view=view)
 
 
-# 2. Slash Commands
+# 2. Slash commands
 @bot.tree.command(name="help", description="Show simple components V2 example")
 async def help(interaction: discord.Interaction):
     view = SimpleLayoutView(author_id=interaction.user.id, user_name=interaction.user.name)
