@@ -89,7 +89,6 @@ class SimpleLayoutView(LayoutView):
         self.render("home")
 
     def render(self, option: str):
-        """Hàm cập nhật/vẽ lại giao diện dựa theo tab được chọn"""
         self.clear_items()  # Dọn dẹp toàn bộ thành phần cũ trên View
         
         # Gọi hàm tạo Container mới
@@ -108,7 +107,6 @@ class SimpleLayoutView(LayoutView):
         return True
 
     async def on_select(self, interaction: discord.Interaction):
-        """Lắng nghe và xử lý sự kiện khi chọn 1 item trong Dropdown"""
         # Lấy giá trị 'value' của tùy chọn vừa bấm
         selected = interaction.data["values"][0]
         
@@ -128,7 +126,6 @@ class CoreBot(commands.Bot):
         )
 
     async def setup_hook(self) -> None:
-        """Đồng bộ Slash Commands nếu cần sử dụng"""
         await self.tree.sync()
 
     async def on_ready(self) -> None:
@@ -146,7 +143,7 @@ async def help_command(ctx: commands.Context) -> None:
 
 
 # 2. Slash commands
-@bot.tree.command(name="help", description="Show simple components V2 example")
+@bot.tree.command(name="help", description="Show all available commands")
 async def help(interaction: discord.Interaction):
     view = SimpleLayoutView(author_id=interaction.user.id, user_name=interaction.user.name)
     await interaction.response.send_message(view=view, ephemeral=True)
@@ -154,14 +151,14 @@ async def help(interaction: discord.Interaction):
 
 if __name__ == "__main__":
     if BOT_TOKEN == "YOUR_BOT_TOKEN" or not BOT_TOKEN:
-        print("[!] ERROR: Token trống hoặc chưa cấu hình!")
+        print("[!] ERROR: Token is empty or not configured!")
         sys.exit(1)
         
     try:
         bot.run(BOT_TOKEN)
     except discord.errors.LoginFailure:
-        print("[!] ERROR: Token không hợp lệ!")
+        print("[!] ERROR: Invalid token!")
         sys.exit(1)
     except KeyboardInterrupt:
-        print("\n[!] Bot đã dừng!")
+        print("\n[!] Bot stopped!")
         
