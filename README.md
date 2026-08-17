@@ -3,7 +3,7 @@
 ---
 
 # Support Server
-https://discord.gg/3SngpfcgVT
+https://discord.gg/DcfZvwcsdt
 
 ---
 
