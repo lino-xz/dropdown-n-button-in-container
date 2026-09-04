@@ -1,12 +1,12 @@
 import sys
+import asyncio
 from datetime import datetime, timedelta, timezone
 import discord
 from discord import ui
 from discord.ext import commands
 
-TOKEN = "YOUR_BOT_TOKEN"
+TOKEN = "bot_token"
 PREFIX = "$"
-
 intents = discord.Intents.all()
 VN_TZ = timezone(timedelta(hours=7))
 
@@ -21,42 +21,26 @@ def build_container(username: str, selected: str = "home") -> tuple[ui.Container
         container.add_item(ui.Separator())
         container.add_item(ui.TextDisplay("-# Looking good"))
         container.add_item(ui.Separator())
-
         container.add_item(ui.TextDisplay("### Vanish Club"))
-        container.add_item(ui.TextDisplay(
-            "- **1:** Ktn\n"
-            "- **2:** Lino\n"
-            "- **3:** Pepsi"
-        ))
+        container.add_item(ui.TextDisplay("- **1:** Ktn\n- **2:** Lino\n- **3:** Pepsi"))
         container.add_item(ui.Separator())
-
         container.add_item(ui.TextDisplay("### Commands"))
-        container.add_item(ui.TextDisplay(
-            "- `$help` - Show Components V2 example\n"
-            "- `$demo` - Show Components V2 example\n"
-            "- `$preview` - Show Components V2 example"
-        ))
+        container.add_item(ui.TextDisplay("- `$help` - Show Components V2 example\n- `$demo` - Show Components V2 example\n- `$preview` - Show Components V2 example"))
 
     # Bot information
     elif selected == "info":
         container.add_item(ui.TextDisplay("## Bot Information"))
         container.add_item(ui.Separator())
-        container.add_item(ui.TextDisplay(
-            "This bot is built using **discord.py** with Components V2!"
-        ))
+        container.add_item(ui.TextDisplay("This bot is built using **discord.py** with Components V2!"))
 
     # Ping test
     elif selected == "ping":
         container.add_item(ui.TextDisplay("## Ping Command"))
         container.add_item(ui.Separator())
-        container.add_item(ui.TextDisplay(
-            "Pong. Everything is running smoothly!"
-        ))
+        container.add_item(ui.TextDisplay("Pong. Everything is running smoothly!"))
 
     container.add_item(ui.Separator())
-    container.add_item(ui.TextDisplay(
-        f"-# Requested by {username} • {timestamp}"
-    ))
+    container.add_item(ui.TextDisplay(f"-# Requested by {username} • {timestamp}"))
     container.add_item(ui.Separator())
 
     # Dropdown menu
@@ -68,7 +52,6 @@ def build_container(username: str, selected: str = "home") -> tuple[ui.Container
             discord.SelectOption(label="Ping Test", value="ping", emoji="🏓", default=selected == "ping"),
         ],
     )
-
     container.add_item(ui.ActionRow(dropdown))
 
     # Link buttons
@@ -89,17 +72,13 @@ class SimpleLayoutView(ui.LayoutView):
 
     def render(self, selected: str):
         self.clear_items()
-
         container, dropdown = build_container(self.username, selected)
         dropdown.callback = self.on_select
         self.add_item(container)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.author_id:
-            await interaction.response.send_message(
-                "❌ You cannot use this menu!",
-                ephemeral=True
-            )
+            await interaction.response.send_message("❌ You cannot use this menu!", ephemeral=True)
             return False
         return True
 
@@ -109,47 +88,27 @@ class SimpleLayoutView(ui.LayoutView):
         await interaction.response.edit_message(view=self)
 
 
-class CoreBot(commands.Bot):
-    def __init__(self):
-        super().__init__(
-            command_prefix=PREFIX,
-            intents=intents,
-            help_command=None
-        )
-
-    async def setup_hook(self):
-        await self.tree.sync()
-
-    async def on_ready(self):
-        print("=" * 50)
-        print(f"[+] Logged in as {self.user} | ID: {self.user.id}")
-        print("=" * 50)
+bot = commands.Bot(command_prefix=PREFIX, intents=intents, help_command=None)
 
 
-bot = CoreBot()
+@bot.event
+async def on_ready():
+    print(f"[+] Logged in as {bot.user} | ID: {bot.user.id}")
 
 
-# Prefix command
 @bot.command(name="help", aliases=["demo", "preview"])
 async def help_command(ctx: commands.Context):
     view = SimpleLayoutView(ctx.author.id, ctx.author.name)
     await ctx.send(view=view)
 
 
-# Slash command
-@bot.tree.command(name="help", description="Show all available commands")
-async def help_command_slash(interaction: discord.Interaction):
-    view = SimpleLayoutView(interaction.user.id, interaction.user.name)
-    await interaction.response.send_message(view=view, ephemeral=True)
-
-
 if __name__ == "__main__":
-    if not TOKEN or TOKEN == "YOUR_BOT_TOKEN":
+    if not TOKEN or TOKEN == "bot_token":
         print("[!] Bot token is not configured!")
         sys.exit(1)
 
     try:
-        bot.run(TOKEN)
+        asyncio.run(bot.start(TOKEN))
     except discord.LoginFailure:
         print("[!] Invalid bot token!")
         sys.exit(1)
